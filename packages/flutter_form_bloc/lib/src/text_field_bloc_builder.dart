@@ -6,11 +6,9 @@ import 'package:flutter_form_bloc/src/flutter_typeahead.dart';
 import 'package:flutter_form_bloc/src/theme/field_theme_resolver.dart';
 import 'package:flutter_form_bloc/src/utils/utils.dart';
 
-export 'package:flutter/services.dart'
-    show TextInputType, TextInputAction, TextCapitalization;
+export 'package:flutter/services.dart' show TextInputType, TextInputAction, TextCapitalization;
 export 'package:flutter/widgets.dart' show EditableText;
-export 'package:flutter_form_bloc/src/flutter_typeahead.dart'
-    show SuggestionsBoxDecoration;
+export 'package:flutter_form_bloc/src/flutter_typeahead.dart' show SuggestionsBoxDecoration;
 
 const double _kMenuItemHeight = 48.0;
 const EdgeInsets _kMenuItemPadding = EdgeInsets.symmetric(horizontal: 16.0);
@@ -70,7 +68,7 @@ class TextFieldBlocBuilder extends StatefulWidget {
   ///  * [maxLength], which discusses the precise meaning of "number of
   ///    characters" and how it may differ from the intuitive meaning.
   const TextFieldBlocBuilder({
-    Key? key,
+    super.key,
     required this.textFieldBloc,
     this.enableOnlyWhenFormBlocCanSubmit = false,
     this.isEnabled = true,
@@ -157,13 +155,9 @@ class TextFieldBlocBuilder extends StatefulWidget {
           !expands || (minLines == null),
           'minLines and maxLines must be null when expands is true.',
         ),
-        assert(maxLength == null ||
-            maxLength == TextFieldBlocBuilder.noMaxLength ||
-            maxLength > 0),
-        keyboardType = keyboardType ??
-            (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
-        textStyle = textStyle ?? style,
-        super(key: key);
+        assert(maxLength == null || maxLength == TextFieldBlocBuilder.noMaxLength || maxLength > 0),
+        keyboardType = keyboardType ?? (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
+        textStyle = textStyle ?? style;
 
   /// {@template flutter_form_bloc.FieldBlocBuilder.fieldBloc}
   /// The `fieldBloc` for rebuild the widget
@@ -402,9 +396,9 @@ class TextFieldBlocBuilder extends StatefulWidget {
   /// {@template flutter_form_bloc.FieldBlocBuilder.textColor}
   /// It is the color of the text
   ///
-  /// You can receive this state: [MaterialState.disabled]
+  /// You can receive this state: [WidgetState.disabled]
   /// {@endtemplate}
-  final MaterialStateProperty<Color?>? textColor;
+  final WidgetStateProperty<Color?>? textColor;
 
   /// {@macro flutter.widgets.editableText.strutStyle}
   final StrutStyle? strutStyle;
@@ -704,9 +698,8 @@ class TextFieldBlocBuilder extends StatefulWidget {
       textColor: textColor ?? resolver.textColor,
       textAlign: textAlign ?? fieldTheme.textAlign ?? TextAlign.start,
       clearSuffixButtonTheme: ClearSuffixButtonTheme(
-        visibleWithoutValue: cleanTheme.visibleWithoutValue ??
-            formTheme.clearSuffixButtonTheme.visibleWithoutValue ??
-            true,
+        visibleWithoutValue:
+            cleanTheme.visibleWithoutValue ?? formTheme.clearSuffixButtonTheme.visibleWithoutValue ?? true,
         appearDuration: cleanTheme.appearDuration,
         // ignore: deprecated_member_use_from_same_package
         icon: clearTextIcon ?? cleanTheme.icon ?? fieldTheme.clearIcon,
@@ -723,8 +716,7 @@ class TextFieldBlocBuilder extends StatefulWidget {
       ),
       suggestionsTextStyle: fieldTheme.suggestionsTextStyle ??
           theme.textTheme.titleMedium!.copyWith(
-            color: ThemeData.estimateBrightnessForColor(theme.canvasColor) ==
-                    Brightness.dark
+            color: ThemeData.estimateBrightnessForColor(theme.canvasColor) == Brightness.dark
                 ? Colors.white
                 : Colors.grey[800],
           ),
@@ -792,8 +784,7 @@ class _TextFieldBlocBuilderState extends State<TextFieldBlocBuilder> {
 
     // TODO: Find out why the cursor returns to the beginning.
     await Future.delayed(const Duration(milliseconds: 0));
-    _controller.selection =
-        TextSelection.collapsed(offset: _controller.text.length);
+    _controller.selection = TextSelection.collapsed(offset: _controller.text.length);
   }
 
   void obscureText(bool value) {
@@ -814,8 +805,7 @@ class _TextFieldBlocBuilderState extends State<TextFieldBlocBuilder> {
           builder: (context, state) {
             final isEnabled = fieldBlocIsEnabled(
               isEnabled: widget.isEnabled,
-              enableOnlyWhenFormBlocCanSubmit:
-                  widget.enableOnlyWhenFormBlocCanSubmit,
+              enableOnlyWhenFormBlocCanSubmit: widget.enableOnlyWhenFormBlocCanSubmit,
               fieldBlocState: state,
             );
 
@@ -846,25 +836,43 @@ class _TextFieldBlocBuilderState extends State<TextFieldBlocBuilder> {
         case SuffixButton.obscureText:
           if (widget.obscureText == null) {
             decoration = decoration.copyWith(
-              suffixIcon: _buildObscureSuffixButton(
-                buttonTheme: fieldTheme.obscureSuffixButtonTheme,
+              suffixIcon: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildObscureSuffixButton(
+                    buttonTheme: fieldTheme.obscureSuffixButtonTheme,
+                  ),
+                  decoration.suffixIcon ?? const SizedBox(),
+                ],
               ),
             );
           }
           break;
         case SuffixButton.clearText:
           decoration = decoration.copyWith(
-            suffixIcon: _buildClearSuffixButton(
-              buttonTheme: fieldTheme.clearSuffixButtonTheme,
+            suffixIcon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildClearSuffixButton(
+                  buttonTheme: fieldTheme.clearSuffixButtonTheme,
+                ),
+                decoration.suffixIcon ?? const SizedBox(),
+              ],
             ),
           );
           break;
         case SuffixButton.asyncValidating:
           decoration = decoration.copyWith(
-            suffixIcon: AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: state.canShowIsValidating ? 1.0 : 0.0,
-              child: widget.asyncValidatingIcon,
+            suffixIcon: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: state.canShowIsValidating ? 1.0 : 0.0,
+                  child: widget.asyncValidatingIcon,
+                ),
+                decoration.suffixIcon ?? const SizedBox(),
+              ],
             ),
           );
       }
@@ -918,8 +926,7 @@ class _TextFieldBlocBuilderState extends State<TextFieldBlocBuilder> {
         autofillHints: widget.autofillHints,
         decoration: _buildDecoration(fieldTheme, state),
         keyboardType: widget.keyboardType,
-        textInputAction: widget.textInputAction ??
-            (widget.nextFocusNode != null ? TextInputAction.next : null),
+        textInputAction: widget.textInputAction ?? (widget.nextFocusNode != null ? TextInputAction.next : null),
         textCapitalization: widget.textCapitalization,
         style: Style.resolveTextStyle(
           isEnabled: isEnabled,
